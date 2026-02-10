@@ -1,5 +1,7 @@
 package com.example.nationscope.domain;
 
+import com.example.nationscope.enums.Continent;
+
 import java.util.List;
 import java.util.TimeZone;
 

@@ -1,4 +1,4 @@
-package com.example.nationscope.domain;
+package com.example.nationscope.enums;
 
 public enum Continent {
     AMERICA,
