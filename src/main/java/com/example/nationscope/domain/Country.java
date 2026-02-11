@@ -1,7 +1,5 @@
 package com.example.nationscope.domain;
 
-import com.example.nationscope.enums.Continent;
-
 import java.util.List;
 import java.util.TimeZone;
 
@@ -9,7 +7,7 @@ public class Country {
 
     String name;
     String capital;
-    Continent continent;
+    List<String> continents;
     Double area;
     Long population;
     List<TimeZone> timeZones;
