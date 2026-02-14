@@ -1,7 +1,13 @@
 package com.example.nationscope.domain;
 
+import lombok.*;
+
 import java.math.BigDecimal;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class EconomicIndicators {
 
     private BigDecimal gdp;
