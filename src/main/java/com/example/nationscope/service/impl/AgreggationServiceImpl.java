@@ -40,8 +40,8 @@ public class AgreggationServiceImpl implements AgreggationService {
                 .timeZones(response.timeZones())
 
                 //temporales mientras se implementa el consumo de la API correspondiente
-                .socialIndicators(new SocialIndicators())
-                .economicIndicators(new EconomicIndicators())
+                .socialIndicators(null)
+                .economicIndicators(null)
                 .build();
 
     }
