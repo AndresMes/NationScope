@@ -1,6 +1,6 @@
 package com.example.nationscope.controller;
 
-import com.example.nationscope.application.impl.OrchestratorImpl;
+import com.example.nationscope.service.impl.OrchestratorImpl;
 import com.example.nationscope.dto.response.CountryDTOResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

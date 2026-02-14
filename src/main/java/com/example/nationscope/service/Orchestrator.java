@@ -1,4 +1,4 @@
-package com.example.nationscope.application;
+package com.example.nationscope.service;
 
 import com.example.nationscope.dto.response.CountryDTOResponse;
 
