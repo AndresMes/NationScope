@@ -1,18 +1,24 @@
 package com.example.nationscope.domain;
 
-import com.example.nationscope.enums.Continent;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.TimeZone;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class Country {
 
     String name;
-    String capital;
-    Continent continent;
+    List<String> capital;
+    List<String> continents;
     Double area;
     Long population;
-    List<TimeZone> timeZones;
+    List<String> timeZones;
     List<String> languages;
 
     EconomicIndicators economicIndicators;
