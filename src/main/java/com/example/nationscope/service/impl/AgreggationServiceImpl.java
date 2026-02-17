@@ -1,10 +1,13 @@
 package com.example.nationscope.service.impl;
 
 import com.example.nationscope.client.CountriesClient;
+import com.example.nationscope.client.WorldBankClient;
 import com.example.nationscope.domain.EconomicIndicators;
 import com.example.nationscope.domain.SocialIndicators;
 import com.example.nationscope.dto.external.CountryDtoRestCountries;
+import com.example.nationscope.dto.external.WorldBankPointDTO;
 import com.example.nationscope.dto.response.CountryDTOResponse;
+import com.example.nationscope.dto.response.EconomicIndicatorsDTOResponse;
 import com.example.nationscope.service.AgreggationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import java.util.List;
 public class AgreggationServiceImpl implements AgreggationService {
 
     private final CountriesClient countriesClient;
+    private final WorldBankClient worldBankClient;
 
     @Override
     public CountryDTOResponse buildCountryEntity(String countryName) {
@@ -44,5 +48,15 @@ public class AgreggationServiceImpl implements AgreggationService {
                 .economicIndicators(null)
                 .build();
 
+    }
+
+    private EconomicIndicatorsDTOResponse buildEconomicIndicators(String countryCode){
+
+        WorldBankPointDTO gdp = worldBankClient.getGdpByCountry(countryCode);
+        WorldBankPointDTO growthRate;
+
+        return EconomicIndicatorsDTOResponse.builder()
+                .gdp(gdp.value())
+                .build();
     }
 }
