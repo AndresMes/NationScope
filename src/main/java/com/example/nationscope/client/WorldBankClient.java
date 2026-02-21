@@ -28,12 +28,24 @@ public class WorldBankClient {
         this.objectMapper = objectMapper;
     }
 
-    public WorldBankPointDTO getGdpByCountry(String countryCode, String indicator){
+    public WorldBankPointDTO getGdpByCountry(String countryCode){
         return fetchWorldBankIndicator(countryCode, GDP_INDICATOR);
     }
 
-    public WorldBankPointDTO getGrowthRateByCountry(String countryCode, String indicator){
+    public WorldBankPointDTO getGrowthRateByCountry(String countryCode){
         return fetchWorldBankIndicator(countryCode, GROWTH_RATE_INDICATOR);
+    }
+
+    public WorldBankPointDTO getInflationByCountry(String countryCode){
+        return fetchWorldBankIndicator(countryCode, INFLATION_INDICATOR);
+    }
+
+    public WorldBankPointDTO getUnempploymentIndicatorByCountry(String countryCode){
+        return fetchWorldBankIndicator(countryCode, UNEMPLOYMENT_INDICATOR);
+    }
+
+    public WorldBankPointDTO getPublicDebtByCountry(String countryCode){
+        return fetchWorldBankIndicator(countryCode, PUBLIC_DEBT_INDICATOR);
     }
 
     private WorldBankPointDTO fetchWorldBankIndicator(String countryCode, String indicator) {

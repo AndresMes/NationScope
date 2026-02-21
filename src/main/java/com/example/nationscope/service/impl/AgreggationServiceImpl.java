@@ -9,9 +9,11 @@ import com.example.nationscope.dto.external.WorldBankPointDTO;
 import com.example.nationscope.dto.response.CountryDTOResponse;
 import com.example.nationscope.dto.response.EconomicIndicatorsDTOResponse;
 import com.example.nationscope.service.AgreggationService;
+import com.example.nationscope.utils.CountryCodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -20,43 +22,59 @@ public class AgreggationServiceImpl implements AgreggationService {
 
     private final CountriesClient countriesClient;
     private final WorldBankClient worldBankClient;
+    private final CountryCodeConverter countryCodeConverter;
 
     @Override
     public CountryDTOResponse buildCountryEntity(String countryName) {
-
-        if(countryName == null){
-            throw new IllegalArgumentException("Argument cannot be null");
+        if (countryName == null || countryName.isBlank()) {
+            throw new IllegalArgumentException("Country name cannot be null or empty");
         }
 
-        String countryNameLowered = countryName.toLowerCase();
+        CountryDtoRestCountries restCountriesResponse = countriesClient.getCountryByName(countryName.toLowerCase());
 
-        CountryDtoRestCountries response = countriesClient.getCountryByName(countryNameLowered);
+        EconomicIndicatorsDTOResponse ecoDto = buildEconomicIndicators(countryName);
+
+        //Refactor to a proper mapper soon
+        EconomicIndicators ecoDomain = mapToDomain(ecoDto);
 
         return CountryDTOResponse.builder()
-                .name(response.name().common())
-                .capital(response.capital() != null
-                        ? response.capital()
-                        : List.of())
-                .area(response.area())
-                .languages(response.languages())
-                .population(response.population())
-                .continents(response.continents())
-                .timeZones(response.timeZones())
-
-                //temporales mientras se implementa el consumo de la API correspondiente
-                .socialIndicators(null)
-                .economicIndicators(null)
+                .name(restCountriesResponse.name().common())
+                .capital(restCountriesResponse.capital() != null ? restCountriesResponse.capital() : List.of())
+                .area(restCountriesResponse.area())
+                .population(restCountriesResponse.population())
+                .economicIndicators(ecoDomain)
+                .currencies(restCountriesResponse.currencies())
+                .languages(restCountriesResponse.languages())
                 .build();
-
     }
 
-    private EconomicIndicatorsDTOResponse buildEconomicIndicators(String countryCode){
-
-        WorldBankPointDTO gdp = worldBankClient.getGdpByCountry(countryCode);
-        WorldBankPointDTO growthRate;
+    private EconomicIndicatorsDTOResponse buildEconomicIndicators(String country) {
+        String isoCode = countryCodeConverter.convertToIso(country);
 
         return EconomicIndicatorsDTOResponse.builder()
-                .gdp(gdp.value())
+                .gdp(safeGetBigDecimal(worldBankClient.getGdpByCountry(isoCode)))
+                .growthRate(safeGetDouble(worldBankClient.getGrowthRateByCountry(isoCode)))
+                .inflation(safeGetDouble(worldBankClient.getInflationByCountry(isoCode)))
+                .unemployment(safeGetDouble(worldBankClient.getUnempploymentIndicatorByCountry(isoCode)))
+                .publicDebt(safeGetDouble(worldBankClient.getPublicDebtByCountry(isoCode)))
+                .build();
+    }
+
+    private Double safeGetDouble(WorldBankPointDTO dto) {
+        return (dto != null && dto.value() != null) ? dto.value().doubleValue() : 0.0;
+    }
+
+    private BigDecimal safeGetBigDecimal(WorldBankPointDTO dto) {
+        return (dto != null && dto.value() != null) ? dto.value() : BigDecimal.ZERO;
+    }
+
+    private EconomicIndicators mapToDomain(EconomicIndicatorsDTOResponse dto) {
+        return EconomicIndicators.builder()
+                .gdp(dto.gdp())
+                .growthRate(dto.growthRate())
+                .inflation(dto.inflation())
+                .unemployment(dto.unemployment())
+                .publicDebt(dto.publicDebt())
                 .build();
     }
 }
