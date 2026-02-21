@@ -10,7 +10,6 @@ public record EconomicIndicatorsDTOResponse(
         Double growthRate,
         Double inflation,
         Double unemployment,
-        String currency,
         Double publicDebt
 ) {
 }

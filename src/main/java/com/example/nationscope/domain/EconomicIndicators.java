@@ -14,6 +14,5 @@ public class EconomicIndicators {
     private Double growthRate;
     private Double inflation;
     private Double unemployment;
-    private String currency;
     private Double publicDebt;
 }
