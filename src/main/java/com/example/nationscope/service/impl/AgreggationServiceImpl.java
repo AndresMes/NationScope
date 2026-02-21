@@ -40,6 +40,7 @@ public class AgreggationServiceImpl implements AgreggationService {
         return CountryDTOResponse.builder()
                 .name(restCountriesResponse.name().common())
                 .capital(restCountriesResponse.capital() != null ? restCountriesResponse.capital() : List.of())
+                .continents(restCountriesResponse.continents())
                 .area(restCountriesResponse.area())
                 .population(restCountriesResponse.population())
                 .economicIndicators(ecoDomain)
