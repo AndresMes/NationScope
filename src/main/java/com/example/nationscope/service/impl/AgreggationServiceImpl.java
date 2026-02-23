@@ -34,18 +34,22 @@ public class AgreggationServiceImpl implements AgreggationService {
 
         EconomicIndicatorsDTOResponse ecoDto = buildEconomicIndicators(countryName);
 
+        SocialIndicators socialIndicators = buildSocialIndicators(countryName);
+
         //Refactor to a proper mapper soon
         EconomicIndicators ecoDomain = mapToDomain(ecoDto);
 
         return CountryDTOResponse.builder()
                 .name(restCountriesResponse.name().common())
                 .capital(restCountriesResponse.capital() != null ? restCountriesResponse.capital() : List.of())
+                .timeZones(restCountriesResponse.timeZones())
                 .continents(restCountriesResponse.continents())
                 .area(restCountriesResponse.area())
                 .population(restCountriesResponse.population())
-                .economicIndicators(ecoDomain)
                 .currencies(restCountriesResponse.currencies())
                 .languages(restCountriesResponse.languages())
+                .economicIndicators(ecoDomain)
+                .socialIndicators(socialIndicators)
                 .build();
     }
 
@@ -56,8 +60,19 @@ public class AgreggationServiceImpl implements AgreggationService {
                 .gdp(safeGetBigDecimal(worldBankClient.getGdpByCountry(isoCode)))
                 .growthRate(safeGetDouble(worldBankClient.getGrowthRateByCountry(isoCode)))
                 .inflation(safeGetDouble(worldBankClient.getInflationByCountry(isoCode)))
-                .unemployment(safeGetDouble(worldBankClient.getUnempploymentIndicatorByCountry(isoCode)))
+                .unemployment(safeGetDouble(worldBankClient.getUnemploymentIndicatorByCountry(isoCode)))
                 .publicDebt(safeGetDouble(worldBankClient.getPublicDebtByCountry(isoCode)))
+                .build();
+    }
+
+    private SocialIndicators buildSocialIndicators(String country){
+
+        String isoCode = countryCodeConverter.convertToIso(country);
+
+        return SocialIndicators.builder()
+                .literacyRate(safeGetDouble(worldBankClient.getLiteracyRateByCountry(isoCode)))
+                .lifeExpectancy(safeGetDouble(worldBankClient.getLifeExpectancyByCountry(isoCode)))
+                .povertyRate(safeGetDouble(worldBankClient.getPovertyRateByCountry(isoCode)))
                 .build();
     }
 

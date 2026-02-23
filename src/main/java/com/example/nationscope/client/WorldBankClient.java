@@ -17,11 +17,18 @@ public class WorldBankClient {
     private final RestClient worldBankApi;
     private final ObjectMapper objectMapper;
 
+    //Economic indicators
     private static final String GDP_INDICATOR = "NY.GDP.MKTP.CD";
     private static final String GROWTH_RATE_INDICATOR = "NY.GDP.MKTP.KD.ZG";
     private static final String INFLATION_INDICATOR = "FP.CPI.TOTL.ZG";
     private static final String UNEMPLOYMENT_INDICATOR = "SL.UEM.TOTL.ZS";
     private static final String PUBLIC_DEBT_INDICATOR = "GC.DOD.TOTL.GD.ZS";
+
+    //Social indicators
+
+    private static final String LITERACY_RATE_INDICATOR = "SE.ADT.LITR.ZS";
+    private static final String LIFE_EXPECTANCY_INDICATOR = "SP.DYN.LE00.IN";
+    private static final String POVERTY_RATE_INDICATOR = "SI.POV.DDAY";
 
     public WorldBankClient(@Qualifier("worldBankRestClient") RestClient worldBankApi, ObjectMapper objectMapper) {
         this.worldBankApi = worldBankApi;
@@ -40,7 +47,7 @@ public class WorldBankClient {
         return fetchWorldBankIndicator(countryCode, INFLATION_INDICATOR);
     }
 
-    public WorldBankPointDTO getUnempploymentIndicatorByCountry(String countryCode){
+    public WorldBankPointDTO getUnemploymentIndicatorByCountry(String countryCode){
         return fetchWorldBankIndicator(countryCode, UNEMPLOYMENT_INDICATOR);
     }
 
@@ -48,10 +55,22 @@ public class WorldBankClient {
         return fetchWorldBankIndicator(countryCode, PUBLIC_DEBT_INDICATOR);
     }
 
+    public WorldBankPointDTO getLiteracyRateByCountry(String countryCode){
+        return fetchWorldBankIndicator(countryCode, LITERACY_RATE_INDICATOR);
+    }
+
+    public WorldBankPointDTO getLifeExpectancyByCountry(String countryCode){
+        return fetchWorldBankIndicator(countryCode, LIFE_EXPECTANCY_INDICATOR);
+    }
+
+    public WorldBankPointDTO getPovertyRateByCountry(String countryCode){
+        return fetchWorldBankIndicator(countryCode, POVERTY_RATE_INDICATOR);
+    }
+
     private WorldBankPointDTO fetchWorldBankIndicator(String countryCode, String indicator) {
 
         Object[] response = worldBankApi.get()
-                .uri("/country/" + countryCode + "/indicator/" + indicator+"?format=json&per_page=1")
+                .uri("/country/" + countryCode + "/indicator/" + indicator+"?format=json&per_page=5")
                 .retrieve()
                 .body(Object[].class);
 
@@ -69,7 +88,11 @@ public class WorldBankClient {
             throw new DataNotAvailableForCountryWorldBankException("No data available for this indicator for country: " + countryCode);
         }
 
-        return list.get(0);
+
+        return list.stream()
+                .filter(dto -> dto.value() != null)
+                .findFirst()
+                .orElse(null);
     }
 
 
