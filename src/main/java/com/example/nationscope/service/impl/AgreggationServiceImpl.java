@@ -8,6 +8,7 @@ import com.example.nationscope.dto.external.CountryDtoRestCountries;
 import com.example.nationscope.dto.external.WorldBankPointDTO;
 import com.example.nationscope.dto.response.CountryDTOResponse;
 import com.example.nationscope.dto.response.EconomicIndicatorsDTOResponse;
+import com.example.nationscope.dto.response.SocialIndicatorsDTOResponse;
 import com.example.nationscope.service.AgreggationService;
 import com.example.nationscope.utils.CountryCodeConverter;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +35,8 @@ public class AgreggationServiceImpl implements AgreggationService {
 
         EconomicIndicatorsDTOResponse ecoDto = buildEconomicIndicators(countryName);
 
-        SocialIndicators socialIndicators = buildSocialIndicators(countryName);
+        SocialIndicatorsDTOResponse socialIndicators = buildSocialIndicators(countryName);
 
-        //Refactor to a proper mapper soon
-        EconomicIndicators ecoDomain = mapToDomain(ecoDto);
 
         return CountryDTOResponse.builder()
                 .name(restCountriesResponse.name().common())
@@ -48,7 +47,7 @@ public class AgreggationServiceImpl implements AgreggationService {
                 .population(restCountriesResponse.population())
                 .currencies(restCountriesResponse.currencies())
                 .languages(restCountriesResponse.languages())
-                .economicIndicators(ecoDomain)
+                .economicIndicators(ecoDto)
                 .socialIndicators(socialIndicators)
                 .build();
     }
@@ -65,11 +64,11 @@ public class AgreggationServiceImpl implements AgreggationService {
                 .build();
     }
 
-    private SocialIndicators buildSocialIndicators(String country){
+    private SocialIndicatorsDTOResponse buildSocialIndicators(String country){
 
         String isoCode = countryCodeConverter.convertToIso(country);
 
-        return SocialIndicators.builder()
+        return SocialIndicatorsDTOResponse.builder()
                 .literacyRate(safeGetDouble(worldBankClient.getLiteracyRateByCountry(isoCode)))
                 .lifeExpectancy(safeGetDouble(worldBankClient.getLifeExpectancyByCountry(isoCode)))
                 .povertyRate(safeGetDouble(worldBankClient.getPovertyRateByCountry(isoCode)))
@@ -84,13 +83,4 @@ public class AgreggationServiceImpl implements AgreggationService {
         return (dto != null && dto.value() != null) ? dto.value() : BigDecimal.ZERO;
     }
 
-    private EconomicIndicators mapToDomain(EconomicIndicatorsDTOResponse dto) {
-        return EconomicIndicators.builder()
-                .gdp(dto.gdp())
-                .growthRate(dto.growthRate())
-                .inflation(dto.inflation())
-                .unemployment(dto.unemployment())
-                .publicDebt(dto.publicDebt())
-                .build();
-    }
 }

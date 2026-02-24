@@ -20,7 +20,7 @@ public record CountryDTOResponse(
         Map<String, String> languages,
         Map<String, CountryDtoRestCountries.CurrencyDTO> currencies,
 
-        EconomicIndicators economicIndicators,
-        SocialIndicators socialIndicators
+        EconomicIndicatorsDTOResponse economicIndicators,
+        SocialIndicatorsDTOResponse socialIndicators
 ) {
 }
