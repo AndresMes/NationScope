@@ -74,7 +74,7 @@ public class WorldBankClient {
 
     public WorldBankPointDTO getSchoolLifeExpetancy(String countryCode){
         Object[] response = worldBankApi.get()
-                .uri("/country/" + countryCode + "/indicator/SE.SCH.LIFE" +"?format=json&per_page=60")
+                    .uri("/country/" + countryCode + "/indicator/SE.SCH.LIFE" +"?format=json&per_page=60")
                 .retrieve()
                 .body(Object[].class);
 

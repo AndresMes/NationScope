@@ -65,11 +65,11 @@ public class AgreggationServiceImpl implements AgreggationService {
     }
 
     private Double safeGetDouble(WorldBankPointDTO dto) {
-        return (dto != null && dto.value() != null) ? dto.value().doubleValue() : 0.0;
+        return (dto != null && dto.value() != null) ? dto.value().doubleValue() : null;
     }
 
     private BigDecimal safeGetBigDecimal(WorldBankPointDTO dto) {
-        return (dto != null && dto.value() != null) ? dto.value() : BigDecimal.ZERO;
+        return (dto != null && dto.value() != null) ? dto.value() : null;
     }
 
 }

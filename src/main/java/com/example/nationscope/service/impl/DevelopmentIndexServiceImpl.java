@@ -53,7 +53,7 @@ public class DevelopmentIndexServiceImpl implements DevelopmentIndexService {
 
 
     private Double safeGetDouble(WorldBankPointDTO dto) {
-        return (dto != null && dto.value() != null) ? dto.value().doubleValue() : 0.0;
+        return (dto != null && dto.value() != null) ? dto.value().doubleValue() : null;
     }
 
     private Double calculateEducationIndex(Double schoolLifeExpectancy) {
