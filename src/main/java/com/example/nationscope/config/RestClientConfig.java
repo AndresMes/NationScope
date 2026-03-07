@@ -13,4 +13,11 @@ public class RestClientConfig {
                 .baseUrl("https://restcountries.com/v3.1")
                 .build();
     }
+
+    @Bean
+    public RestClient worldBankRestClient(){
+        return RestClient.builder()
+                .baseUrl("https://api.worldbank.org/v2")
+                .build();
+    }
 }
