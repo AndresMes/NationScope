@@ -2,14 +2,13 @@ package com.example.nationscope.service.impl;
 
 import com.example.nationscope.client.CountriesClient;
 import com.example.nationscope.client.WorldBankClient;
-import com.example.nationscope.domain.EconomicIndicators;
-import com.example.nationscope.domain.SocialIndicators;
 import com.example.nationscope.dto.external.CountryDtoRestCountries;
 import com.example.nationscope.dto.external.WorldBankPointDTO;
 import com.example.nationscope.dto.response.CountryDTOResponse;
 import com.example.nationscope.dto.response.EconomicIndicatorsDTOResponse;
 import com.example.nationscope.dto.response.SocialIndicatorsDTOResponse;
 import com.example.nationscope.service.AgreggationService;
+import com.example.nationscope.service.DevelopmentIndexService;
 import com.example.nationscope.utils.CountryCodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,7 @@ public class AgreggationServiceImpl implements AgreggationService {
 
     private final CountriesClient countriesClient;
     private final WorldBankClient worldBankClient;
+    private final DevelopmentIndexService developmentIndexService;
     private final CountryCodeConverter countryCodeConverter;
 
     @Override
@@ -35,7 +35,7 @@ public class AgreggationServiceImpl implements AgreggationService {
 
         EconomicIndicatorsDTOResponse ecoDto = buildEconomicIndicators(countryName);
 
-        SocialIndicatorsDTOResponse socialIndicators = buildSocialIndicators(countryName);
+        SocialIndicatorsDTOResponse socialIndicators = developmentIndexService.calculateDevelopmentIndexes(countryName);
 
 
         return CountryDTOResponse.builder()
@@ -61,17 +61,6 @@ public class AgreggationServiceImpl implements AgreggationService {
                 .inflation(safeGetDouble(worldBankClient.getInflationByCountry(isoCode)))
                 .unemployment(safeGetDouble(worldBankClient.getUnemploymentIndicatorByCountry(isoCode)))
                 .publicDebt(safeGetDouble(worldBankClient.getPublicDebtByCountry(isoCode)))
-                .build();
-    }
-
-    private SocialIndicatorsDTOResponse buildSocialIndicators(String country){
-
-        String isoCode = countryCodeConverter.convertToIso(country);
-
-        return SocialIndicatorsDTOResponse.builder()
-                .literacyRate(safeGetDouble(worldBankClient.getLiteracyRateByCountry(isoCode)))
-                .lifeExpectancy(safeGetDouble(worldBankClient.getLifeExpectancyByCountry(isoCode)))
-                .povertyRate(safeGetDouble(worldBankClient.getPovertyRateByCountry(isoCode)))
                 .build();
     }
 

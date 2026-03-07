@@ -67,6 +67,38 @@ public class WorldBankClient {
         return fetchWorldBankIndicator(countryCode, POVERTY_RATE_INDICATOR);
     }
 
+    public WorldBankPointDTO getIndicator(String countryCode, String indicator){
+        return fetchWorldBankIndicator(countryCode, indicator);
+    }
+
+
+    public WorldBankPointDTO getSchoolLifeExpetancy(String countryCode){
+        Object[] response = worldBankApi.get()
+                .uri("/country/" + countryCode + "/indicator/SE.SCH.LIFE" +"?format=json&per_page=60")
+                .retrieve()
+                .body(Object[].class);
+
+
+        if (response == null || response.length < 2) {
+            throw new InvalidResponseWorldBankException("No valid response for country: " + countryCode);
+        }
+
+        List<WorldBankPointDTO> list = objectMapper.convertValue(
+                response[1],
+                new TypeReference<List<WorldBankPointDTO>>() {}
+        );
+
+        if (list == null || list.isEmpty()) {
+            throw new DataNotAvailableForCountryWorldBankException("No data available for this indicator for country: " + countryCode);
+        }
+
+
+        return list.stream()
+                .filter(dto -> dto.value() != null)
+                .findFirst()
+                .orElse(null);
+    }
+
     private WorldBankPointDTO fetchWorldBankIndicator(String countryCode, String indicator) {
 
         Object[] response = worldBankApi.get()
