@@ -28,13 +28,10 @@ public class DevelopmentIndexServiceImpl implements DevelopmentIndexService {
                 worldBankClient.getSchoolLifeExpetancy(isoCode)
         );
 
-        System.out.println("School Life Expectancy: " + schoolLifeExpectancy);
 
         Double gniPerCapita = safeGetDouble(
                 worldBankClient.getIndicator(isoCode, "NY.GNP.PCAP.PP.KD")
         );
-
-        System.out.println("GNI: " + gniPerCapita);
 
         Double educationIndex = calculateEducationIndex(schoolLifeExpectancy);
 
