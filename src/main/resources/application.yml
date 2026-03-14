@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: NationScope
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      restCountriesCB:
+        slidingWindowSize: 6
+        failureRateThreshold: 50
+        waitDurationInOpenState: 20s
+        permittedNumberOfCallsInHalfOpenState: 2
+      worldBankCB:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 2
+gemini:
+  api-key: ${GEMINI_API_KEY}
