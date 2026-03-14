@@ -7,10 +7,13 @@ import com.example.nationscope.dto.external.WorldBankPointDTO;
 import com.example.nationscope.dto.response.CountryDTOResponse;
 import com.example.nationscope.dto.response.EconomicIndicatorsDTOResponse;
 import com.example.nationscope.dto.response.SocialIndicatorsDTOResponse;
+import com.example.nationscope.provider.CountryDataProvider;
 import com.example.nationscope.service.AgreggationService;
 import com.example.nationscope.service.DevelopmentIndexService;
 import com.example.nationscope.utils.CountryCodeConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,10 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AgreggationServiceImpl implements AgreggationService {
 
-    private final CountriesClient countriesClient;
-    private final WorldBankClient worldBankClient;
-    private final DevelopmentIndexService developmentIndexService;
-    private final CountryCodeConverter countryCodeConverter;
+    private final CountryDataProvider countryDataProvider;
 
     @Override
     public CountryDTOResponse buildCountryEntity(String countryName) {
@@ -31,11 +31,11 @@ public class AgreggationServiceImpl implements AgreggationService {
             throw new IllegalArgumentException("Country name cannot be null or empty");
         }
 
-        CountryDtoRestCountries restCountriesResponse = countriesClient.getCountryByName(countryName.toLowerCase());
+        CountryDtoRestCountries restCountriesResponse = countryDataProvider.getCountryMainInformation(countryName);
 
-        EconomicIndicatorsDTOResponse ecoDto = buildEconomicIndicators(countryName);
+        EconomicIndicatorsDTOResponse ecoDto = countryDataProvider.buildEconomicIndicators(countryName);
 
-        SocialIndicatorsDTOResponse socialIndicators = developmentIndexService.calculateDevelopmentIndexes(countryName);
+        SocialIndicatorsDTOResponse socialIndicators = countryDataProvider.buildSocialIndicators(countryName);
 
 
         return CountryDTOResponse.builder()
@@ -50,26 +50,6 @@ public class AgreggationServiceImpl implements AgreggationService {
                 .economicIndicators(ecoDto)
                 .socialIndicators(socialIndicators)
                 .build();
-    }
-
-    private EconomicIndicatorsDTOResponse buildEconomicIndicators(String country) {
-        String isoCode = countryCodeConverter.convertToIso(country);
-
-        return EconomicIndicatorsDTOResponse.builder()
-                .gdp(safeGetBigDecimal(worldBankClient.getGdpByCountry(isoCode)))
-                .growthRate(safeGetDouble(worldBankClient.getGrowthRateByCountry(isoCode)))
-                .inflation(safeGetDouble(worldBankClient.getInflationByCountry(isoCode)))
-                .unemployment(safeGetDouble(worldBankClient.getUnemploymentIndicatorByCountry(isoCode)))
-                .publicDebt(safeGetDouble(worldBankClient.getPublicDebtByCountry(isoCode)))
-                .build();
-    }
-
-    private Double safeGetDouble(WorldBankPointDTO dto) {
-        return (dto != null && dto.value() != null) ? dto.value().doubleValue() : null;
-    }
-
-    private BigDecimal safeGetBigDecimal(WorldBankPointDTO dto) {
-        return (dto != null && dto.value() != null) ? dto.value() : null;
     }
 
 }
