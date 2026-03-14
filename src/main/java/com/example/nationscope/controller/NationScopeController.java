@@ -1,5 +1,6 @@
 package com.example.nationscope.controller;
 
+import com.example.nationscope.dto.response.CountryAnalizedDTOResponse;
 import com.example.nationscope.service.impl.OrchestratorImpl;
 import com.example.nationscope.dto.response.CountryDTOResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class NationScopeController {
     private final OrchestratorImpl orchestor;
 
     @GetMapping("/{countryName}")
-    public ResponseEntity<CountryDTOResponse> getCountryByName(@PathVariable String countryName){
-        return ResponseEntity.ok(orchestor.findCountryByName(countryName));
+    public ResponseEntity<CountryAnalizedDTOResponse> getCountryByName(@PathVariable String countryName){
+        return ResponseEntity.ok(orchestor.analyzeCountry(countryName));
     }
 }
