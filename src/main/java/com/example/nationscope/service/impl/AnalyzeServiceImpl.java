@@ -5,7 +5,9 @@ import com.example.nationscope.dto.response.GeminiDTOResponse;
 import com.example.nationscope.service.AnalyzeService;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +17,8 @@ public class AnalyzeServiceImpl implements AnalyzeService {
     private final Client geminiClient;
 
     @Override
+    @Cacheable(value = "ia_analysis", key = "#countryData")
+    @CircuitBreaker(name = "iaCB", fallbackMethod = "fallbackIA")
     public GeminiDTOResponse analyzeCountry(CountryDTOResponse countryData) {
 
         String prompt = """
@@ -110,6 +114,11 @@ public class AnalyzeServiceImpl implements AnalyzeService {
 
     }
 
+    private GeminiDTOResponse fallbackIA(CountryDTOResponse countryData, Throwable e){
+        return GeminiDTOResponse.builder()
+                .data("AI API does not respond. Try again later")
+                .build();
+    }
     private String format(Object value) {
         return (value == null) ? "Data not available" : value.toString();
     }
